@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "start": "gulp --require \"coffee-script/register\""
+  },
+  "devDependencies": {
+    "gulp-coffee": "^1.4.1",
+    "gulp-concat": "^2.1.7"
+  }
+}
