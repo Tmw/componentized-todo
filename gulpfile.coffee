@@ -1,11 +1,12 @@
-gulp    = require 'gulp'
-coffee  = require 'gulp-coffee'
-concat  = require 'gulp-concat'
+gulp       = require 'gulp'
+concat     = require 'gulp-concat'
+browserify = require 'gulp-browserify'
+
 
 # setup coffeescript compile task
 gulp.task 'coffee', ->
-  gulp.src 'src/**/*.coffee'
-    .pipe coffee()
+  gulp.src('src/app.coffee', {read: false})
+    .pipe browserify({transform: ['coffeeify'], extensions: ['.coffee']}) # {transform: ['coffeeify'], extensions: ['.coffee']}
     .pipe concat('app.js')
     .pipe gulp.dest './build'
 
