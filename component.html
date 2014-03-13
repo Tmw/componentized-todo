@@ -1,0 +1,109 @@
+<!-- Other dependencies -->
+<link rel="import" href="jquery.html">
+
+<!-- HTML -->
+<template id="template">
+  <p class="inline checkbox"><input type="checkbox"></p>
+  <p class="inline title"><content></content></p>
+
+  <style>
+    :host {
+      background-color: #FCEEEA;
+      display: block;
+      padding: 10px;
+
+      transition: background-color .2s;
+    }
+
+    :host:done {
+      background-color: red
+    }
+
+    .inline{
+      display: inline;
+    }
+
+    .title{
+      font-weight: bold;
+    }
+
+    .title.done{
+      text-decoration: line-through;
+    }
+
+    :host:hover{
+      background-color: #E9F8FC;
+    }
+  </style>
+
+</template>
+
+
+<!-- JS - Interaction -->
+<script>
+  (function(document){
+    
+    var TodoItemController = function(context){
+      this.context = context;
+
+      // Create a shadow root
+      this.shadow = context.createShadowRoot();
+
+      // stamp out our template in the shadow dom
+      var template = document.querySelector("#template").content.cloneNode(true);
+      this.shadow.appendChild(template);
+
+      // Pick the checkbox
+      this.checkbox         = this.shadow.querySelector("input[type='checkbox']");
+      this.checkbox.onclick = this.checkboxClicked.bind(this);
+    };
+
+    TodoItemController.prototype.checkboxClicked = function(e){
+      var checkbox = e.target;
+      
+      if(checkbox.checked)
+        this.context.setAttribute('done', 'done');
+      else
+       this.context.removeAttribute('done'); 
+    };
+    
+    TodoItemController.prototype.toggleDone = function(isDone){
+      $(this.shadow.querySelector("p.title")).toggleClass('done', isDone);
+
+      if(isDone){
+        $(this.shadow.querySelector("p.checkbox > input")).attr('checked', 'checked');
+      }
+      else{
+        $(this.shadow.querySelector("p.checkbox > input")).removeAttr('checked');
+      }
+    };
+
+    TodoItemController.prototype.attributeChangedCallback = function(attr, oldVal, newVal){
+      if(attr == "done")
+        this.toggleDone(!!newVal);
+    };
+
+    TodoItemController.prototype.attachedCallback = function(){
+      var isDone = $(this.context).attr('done') !== undefined;
+      this.toggleDone(isDone);
+    };
+
+    /////////////// Register the element in the document
+    var TodoItem = Object.create(HTMLElement.prototype);
+    TodoItem.createdCallback = function(){
+      this.controller = new TodoItemController(this);
+    };
+
+    TodoItem.attributeChangedCallback = function(attr, oldVal, newVal){
+      this.controller.attributeChangedCallback(attr, oldVal, newVal);
+    };
+
+    TodoItem.attachedCallback = function(){
+      this.controller.attachedCallback();
+    };
+
+    // register out todo-item tag with the document
+    document.registerElement('todo-item', {prototype: TodoItem});
+
+})(document.currentScript.ownerDocument);
+</script>

@@ -1,17 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Component-1</title>
-  <script src="bower_components/jquery/dist/jquery.js"></script>
-  <script src="build/app.js"></script>
+  <title>Componentized TODO</title>
+
+  <link rel="stylesheet" href="app.css">
+
+  <link rel="import" href="jquery.html">
+  <link rel="import" href="component.html">
+
+  <script>
+    $(document).ready(function(){
+      
+      $("input.new-item").focus().keydown(function(e){
+        
+        if(e.which == 13){ // On return
+
+          // Create a new todo-item tag
+          var element = document.createElement('todo-item');
+
+          // Set the value of the input field as the content of our new todo-item
+          // and place the todo-item tag in our DOM
+          element.innerHTML = $("input.new-item").val();
+          $(".todo-container").prepend(element);
+          
+          // return to initial state of the input
+          $("input.new-item").val("").focus();
+          
+        }
+        
+      });
+
+    });
+  </script>
 </head>
 <body>
-<!-- awesomeness goes here -->
-<x-awesome></x-awesome>
 
+  <h1>Componentized TODO</h1>
 
-<br />
-<button>Do it!</button>
+  <!-- Input field for new todo item -->
+  <div class="new-item-container">
+    <input type="text" class="new-item" placeholder="Do the dishes" />  
+  </div>
+  
+
+  <!-- render the list of todo items -->
+  <div class="todo-container">
+    <todo-item>Take over the world!</todo-item>
+    <todo-item done>Build awesome demo</todo-item>
+  </div>
 
 
 </body>
