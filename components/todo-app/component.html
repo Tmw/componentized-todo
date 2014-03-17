@@ -1,0 +1,164 @@
+<!-- Other dependencies -->
+<link rel="import" href="../todo-item/component.html">
+
+<!-- HTML -->
+<template id="template">
+
+  <!-- component styling -->
+  <style>
+    #addBtn {
+      width: 200px;
+      padding: 10px;
+    }
+
+    .todo-container {
+      width: 800px;
+      margin: 0 auto;
+      background-color: #C7D0D5;
+      height: 500px;
+      overflow-y: scroll;
+      padding: 10px;
+    }
+
+    todo-item{
+      margin-bottom: 10px;
+    }
+
+    todo-item[done]{
+      opacity: .5;
+    }
+
+    .new-item-container {
+      width: 820px;
+      margin: 0 auto;
+      padding-bottom: 10px;
+    }
+
+    .new-item {
+      width: 800px;
+      padding: 10px;
+      border: 1px solid #C7D0D5;
+      outline: none;
+      font-size: 18pt;
+    }
+  </style>
+
+  <h1>Componentized TODO</h1>
+
+  <!-- Input field for new todo item -->
+  <div class="new-item-container">
+    <input type="text" class="new-item" placeholder="Do the dishes" />  
+  </div>
+
+  <!-- render the list of todo items -->
+  <div class="todo-container"></div>
+
+</template>
+
+<!-- JS - Interaction -->
+
+<script>
+  (function(document){
+    
+    var TodoAppController = function(context){
+      // save the context to the custom element
+      this.context = context;
+
+      // Create an empty collection for the todo items
+      this.collection = [];
+
+      // Create a shadow root
+      this.shadow = this.context.createShadowRoot();
+
+      // stamp out our template in the shadow dom
+      var template = document.querySelector("#template").content.cloneNode(true);
+      this.shadow.appendChild(template);
+
+      // Setup event listener
+      this.setupListeners();
+
+      // Initial render of the list
+      this.renderList();
+    };
+
+    TodoAppController.prototype.setupListeners = function(){
+      // Get a reference to the input field inside our shadow DOM
+      var input = this.shadow.querySelector("input.new-item");
+      var self  = this;
+
+      // Attach a event listener to our input element
+      input.addEventListener('keydown', function(e){
+        
+        if(e.which == 13){ // return key hit
+          if(input.value.trim() == "") return;
+
+          // Add our item
+          self.addItem(input.value);
+
+          // Empty our input view
+          input.value = "";
+        }
+
+      });
+
+    };
+
+    TodoAppController.prototype.addItem = function(title, done){
+      if(!done) done = false;
+
+      // Define a item model
+      var itemModel = {title: title, done: done};
+
+      // Add itemModel to the beginning of our collection
+      this.collection.unshift(itemModel);
+
+      // trigger event
+      var addedEvent = new CustomEvent('added', itemModel);
+      this.context.dispatchEvent(addedEvent);
+
+      // Re-render the todo list
+      this.renderList();
+    };
+
+    TodoAppController.prototype.renderList = function(){
+      // Get a reference to the todo container within the shadow DOM
+      var todoContainer = this.shadow.querySelector(".todo-container");
+
+      // Clear current content
+      while(todoContainer.firstChild){
+        todoContainer.removeChild(todoContainer.firstChild)
+      }
+
+      // Render new items
+      for(var i=0; i < this.collection.length; i++){
+        // let document create a new item tag
+        var todoItem = document.createElement('todo-item');
+
+        // Set the content of the tag
+        todoItem.innerHTML = this.collection[i].title;
+
+        // Append child to the container inside the shadow dom
+        todoContainer.appendChild(todoItem);
+      }
+      
+    };
+
+    /////////////// Register the element in the document
+    var TodoApp = Object.create(HTMLElement.prototype);
+    TodoApp.createdCallback = function(){
+      this.controller = new TodoAppController(this);
+    };
+
+    TodoApp.attributeChangedCallback = function(attr, oldVal, newVal){
+      this.controller.attributeChangedCallback(attr, oldVal, newVal);
+    };
+
+    TodoApp.attachedCallback = function(){
+      // this.controller.attachedCallback();
+    };
+
+    // register out todo-item tag with the document
+    document.registerElement('todo-app', {prototype: TodoApp});
+
+  })(document.currentScript.ownerDocument);
+</script>

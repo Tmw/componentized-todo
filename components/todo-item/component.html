@@ -1,11 +1,11 @@
-<!-- Other dependencies -->
-<link rel="import" href="jquery.html">
+<!DOCTYPE html>
 
 <!-- HTML -->
 <template id="template">
   <p class="inline checkbox"><input type="checkbox"></p>
   <p class="inline title"><content></content></p>
 
+  <!-- component styling -->
   <style>
     :host {
       background-color: #FCEEEA;
@@ -38,11 +38,10 @@
 
 </template>
 
-
 <!-- JS - Interaction -->
 <script>
   (function(document){
-    
+
     var TodoItemController = function(context){
       this.context = context;
 
@@ -54,12 +53,22 @@
       this.shadow.appendChild(template);
 
       // Pick the checkbox
-      this.checkbox         = this.shadow.querySelector("input[type='checkbox']");
-      this.checkbox.onclick = this.checkboxClicked.bind(this);
+      this.setupListeners();
+    };
+
+    TodoItemController.prototype.setupListeners = function(){
+      // get a reference to our checkbox inside the Shadow DOM
+      var checkbox = this.shadow.querySelector("input[type='checkbox']"),
+          self = this;
+
+      // Attach event listener
+      checkbox.addEventListener('click', function(e){
+        self.checkboxClicked(e);
+      });
     };
 
     TodoItemController.prototype.checkboxClicked = function(e){
-      var checkbox = e.target;
+      var checkbox = this.shadow.querySelector("input[type='checkbox']");
       
       if(checkbox.checked)
         this.context.setAttribute('done', 'done');
@@ -68,13 +77,13 @@
     };
     
     TodoItemController.prototype.toggleDone = function(isDone){
-      $(this.shadow.querySelector("p.title")).toggleClass('done', isDone);
+      this.shadow.querySelector("p.title").classList.toggle('done', isDone);
 
       if(isDone){
-        $(this.shadow.querySelector("p.checkbox > input")).attr('checked', 'checked');
+        this.shadow.querySelector("p.checkbox > input").setAttribute('checked', 'checked');
       }
       else{
-        $(this.shadow.querySelector("p.checkbox > input")).removeAttr('checked');
+        this.shadow.querySelector("p.checkbox > input").removeAttribute('checked');
       }
     };
 
@@ -84,8 +93,7 @@
     };
 
     TodoItemController.prototype.attachedCallback = function(){
-      var isDone = $(this.context).attr('done') !== undefined;
-      this.toggleDone(isDone);
+      this.toggleDone(this.context.hasAttribute('done'));
     };
 
     /////////////// Register the element in the document
@@ -99,11 +107,11 @@
     };
 
     TodoItem.attachedCallback = function(){
-      this.controller.attachedCallback();
+      // this.controller.attachedCallback();
     };
 
     // register out todo-item tag with the document
-    document.registerElement('todo-item', {prototype: TodoItem});
+    window.document.registerElement('todo-item', {prototype: TodoItem});
 
 })(document.currentScript.ownerDocument);
 </script>
