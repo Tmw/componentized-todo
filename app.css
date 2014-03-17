@@ -9,37 +9,8 @@ h1 {
   text-align: center;
 }
 
-#addBtn {
-  width: 200px;
-  padding: 10px;
-}
-
-.todo-container {
+todo-app{
   width: 800px;
   margin: 0 auto;
-  background-color: #C7D0D5;
-  min-height: 500px;
-  padding: 10px;
-}
-
-todo-item{
-  margin-bottom: 10px;
-}
-
-todo-item[done]{
-  opacity: .5;
-}
-
-.new-item-container {
-  width: 820px;
-  margin: 0 auto;
-  padding-bottom: 10px;
-}
-
-.new-item {
-  width: 800px;
-  padding: 10px;
-  border: 1px solid #C7D0D5;
-  outline: none;
-  font-size: 18pt;
+  display: block;
 }
