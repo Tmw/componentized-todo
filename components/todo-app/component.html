@@ -149,14 +149,6 @@
       this.controller = new TodoAppController(this);
     };
 
-    TodoApp.attributeChangedCallback = function(attr, oldVal, newVal){
-      this.controller.attributeChangedCallback(attr, oldVal, newVal);
-    };
-
-    TodoApp.attachedCallback = function(){
-      // this.controller.attachedCallback();
-    };
-
     // register out todo-item tag with the document
     document.registerElement('todo-app', {prototype: TodoApp});
 
